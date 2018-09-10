@@ -1,0 +1,25 @@
+version: 2
+jobs:
+  check:
+    working_directory: ~/DangerSample
+    docker:
+      - image: circleci/ruby:2.4.1
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ~/DangerSample
+      - restore_cache:
+          key: gems-{{ checksum "Gemfile.lock" }}
+      - run: bundle install --path vendor/bundle
+      - save_cache:
+          paths:
+            - vendor/bundle
+          key: gems-{{ checksum "Gemfile.lock" }}
+      - run:
+          name: Run danger
+          command: bundle exec danger
+workflows:
+  version: 2
+  check:
+    jobs:
+      - check
